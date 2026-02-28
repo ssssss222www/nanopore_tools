@@ -25,12 +25,19 @@ export NANOTRANS_HOME="/mnt/TWET-20250901A/ymm/nanoTrans"
 export WORK_DIR="/media/user/Elements_YMM/Nanopore/results/nanotrans"
 
 # 2. 数据路径设置
-# 样本名称 (Batch ID)
-export BATCH_ID="Arabidopsis_vir1_1"
-# 原始 FAST5 所在目录 (用于 PolyA 分析)
-export RAW_FAST5_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/fast5_multi"
-# Basecalled FASTQ 所在目录 (用于比对)
-export BASECALLED_FASTQ_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/merge_fastq"
+# 批次ID (用于输出目录命名)
+export BATCH_ID="AT_vir_analysis"
+
+# [单样本模式配置 - 已注释]
+# export BATCH_ID="Arabidopsis_vir1_1"
+# export RAW_FAST5_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/fast5_multi"
+# export BASECALLED_FASTQ_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/merge_fastq"
+
+# [多样本模式配置]
+# 为了兼容部分脚本对这两个变量的引用，这里设置为第一个样本的路径或者空值
+# 注意：实际运行中应优先读取 Master Sample Table 中的路径
+export RAW_FAST5_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_1/fast5_multi"
+export BASECALLED_FASTQ_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_1/merge_fastq"
 
 # 3. 参考基因组设置
 # 参考基因组 FASTA 文件路径
@@ -40,7 +47,7 @@ export REF_GTF="/mnt/TWET-20250901A/ymm/data/AT_vir/reference/gtf/TAIR10.gtf"
 
 # 4. 样本信息表设置 (Master Sample Table)
 # 如果你已经有了样本表，请设置路径；否则留空，脚本将尝试为你生成一个单样本的示例表
-export EXISTING_SAMPLE_TABLE=""
+export EXISTING_SAMPLE_TABLE="$SCRIPT_DIR/Master_Sample_Table.txt"
 
 # 5. 实验设计 (用于差异表达分析)
 # 对比组设置 (格式: 实验组,对照组)。如果是单样本，模块03将无法正常运行差异分析。

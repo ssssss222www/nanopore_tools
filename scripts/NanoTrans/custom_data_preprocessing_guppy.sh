@@ -6,10 +6,10 @@ set -e -o pipefail
 #######################################
 
 # [重要] 原始 fast5 文件所在的目录 (请使用绝对路径)
-raw_fast5_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_4/fast5_multi" 
+raw_fast5_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/fast5_multi" 
 
 # [重要] 样本名
-sample_id="Arabidopsis_vir1_4"
+sample_id="Arabidopsis_col0_4"
 
 # [重要] 测序芯片版本
 flowcell_version="FLO-MIN106"
@@ -39,8 +39,8 @@ fi
 # 高级配置 (通常不需要修改)
 #######################################
 # 输出目录
-basecalled_fast5_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_4/fastq_new"
-basecalled_fastq_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_4/merge_fastq"
+basecalled_fast5_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/fastq_new"
+basecalled_fastq_dir="/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/merge_fastq"
 
 # Guppy 参数
 qual=5
