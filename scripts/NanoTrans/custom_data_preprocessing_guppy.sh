@@ -78,6 +78,9 @@ mkdir -p "$basecalled_fast5_dir"
 mkdir -p "$basecalled_fastq_dir"
 
 # GPU 环境配置
+# 想要 fast5_out 就设为 "--fast5_out"，不想要就留空 ""
+fast5_out_flag="--fast5_out"
+
 if [[ $guppy_run_mode == "gpu" ]]; then
     export PATH=$gpu_bin_path:$PATH
     export LD_LIBRARY_PATH=$gpu_lib_path:$LD_LIBRARY_PATH
@@ -93,7 +96,7 @@ if [[ "$guppy_run_mode" == "gpu" ]]; then
     --trim_strategy $trim_strategy \
     --input_path "$raw_fast5_dir" \
     --save_path "$basecalled_fast5_dir" \
-    # --fast5_out \
+    $fast5_out_flag \
     --min_qscore $qual \
     --device $gpu_device \
     --num_callers $num_callers_in_gpu_mode \
@@ -109,7 +112,7 @@ else
     --trim_strategy $trim_strategy \
     --input_path "$raw_fast5_dir" \
     --save_path "$basecalled_fast5_dir" \
-    --fast5_out \
+    $fast5_out_flag \
     --min_qscore $qual \
     --num_callers $num_callers_in_cpu_mode \
     --cpu_threads_per_caller 1 \
