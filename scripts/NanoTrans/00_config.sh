@@ -1,0 +1,84 @@
+#!/bin/bash
+set -e -o pipefail
+
+################################################################################
+# 用户配置区 (请根据实际情况修改以下变量)
+################################################################################
+
+# 1. 项目基础设置
+# 你的 NanoTrans 安装目录 (默认上一级目录，假设脚本在 scripts/NanoTrans)
+# 如果脚本位置改变，请修改此处
+SCRIPT_DIR="/mnt/TWET-20250901A/ymm/scripts/NanoTrans"
+# 假设 NanoTrans 根目录在 scripts/NanoTrans 的上两级 (scripts/..) ? 
+# 原脚本在 pipelines/NanoTrans/custom_analysis_pipeline.sh, 所以 NANOTRANS_HOME 是 pipelines/NanoTrans/../.. = project_root
+# 现脚本在 scripts/NanoTrans/, 所以 NANOTRANS_HOME 应该是 scripts/NanoTrans/../.. = project_root
+# 为了保险，这里建议硬编码或者根据实际情况调整。
+# 既然用户给的路径是 /mnt/TWET-20250901A/ymm/scripts/NanoTrans
+# 而 NanoTrans 安装在 /mnt/TWET-20250901A/ymm/nanoTrans (根据之前的 ls 和 env 信息)
+# 让我们看看之前的 terminal cwd: /mnt/TWET-20250901A/ymm/nanoTrans
+# 之前的 install_dependencies.sh 也是在 /mnt/TWET-20250901A/ymm/nanoTrans 下
+# 所以 NANOTRANS_HOME 应该是 /mnt/TWET-20250901A/ymm/nanoTrans
+
+export NANOTRANS_HOME="/mnt/TWET-20250901A/ymm/nanoTrans"
+
+# 你的工作/输出目录 (所有结果将生成在这里)
+export WORK_DIR="/media/user/Elements_YMM/Nanopore/results/nanotrans"
+
+# 2. 数据路径设置
+# 样本名称 (Batch ID)
+export BATCH_ID="Arabidopsis_vir1_1"
+# 原始 FAST5 所在目录 (用于 PolyA 分析)
+export RAW_FAST5_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/fast5_multi"
+# Basecalled FASTQ 所在目录 (用于比对)
+export BASECALLED_FASTQ_DIR="/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/merge_fastq"
+
+# 3. 参考基因组设置
+# 参考基因组 FASTA 文件路径
+export REF_FASTA="/mnt/TWET-20250901A/ymm/data/AT_vir/reference/total_ref.fa"
+# 参考基因组 GTF 文件路径
+export REF_GTF="/mnt/TWET-20250901A/ymm/data/AT_vir/reference/gtf/TAIR10.gtf"
+
+# 4. 样本信息表设置 (Master Sample Table)
+# 如果你已经有了样本表，请设置路径；否则留空，脚本将尝试为你生成一个单样本的示例表
+export EXISTING_SAMPLE_TABLE=""
+
+# 5. 实验设计 (用于差异表达分析)
+# 对比组设置 (格式: 实验组,对照组)。如果是单样本，模块03将无法正常运行差异分析。
+export CONTRAST="treated,control" 
+# 线程数
+export THREADS=6
+
+################################################################################
+# 初始化环境
+################################################################################
+
+echo ">>> 加载 NanoTrans 环境..."
+if [ -f "$NANOTRANS_HOME/env.sh" ]; then
+    source "$NANOTRANS_HOME/env.sh"
+else
+    echo "Error: 找不到 env.sh，请先运行 install_dependencies.sh！"
+    echo "Expected path: $NANOTRANS_HOME/env.sh"
+    exit 1
+fi
+
+# 创建工作目录
+mkdir -p "$WORK_DIR"
+
+# 创建标准目录结构
+mkdir -p "$WORK_DIR/00.Reference_Genome"
+mkdir -p "$WORK_DIR/00.Long_Reads"
+mkdir -p "$WORK_DIR/01.Reference_Genome_based_Read_Mapping"
+mkdir -p "$WORK_DIR/02.Isoform_Clustering_and_Quantification"
+mkdir -p "$WORK_DIR/03.Isoform_Expression_and_Splicing_Comparison"
+mkdir -p "$WORK_DIR/04.Isoform_RNA_Modification_Identification"
+mkdir -p "$WORK_DIR/05.Isoform_PolyA_Tail_Length_Profiling"
+mkdir -p "$WORK_DIR/06.Gene_Fusion_Detection"
+mkdir -p "$WORK_DIR/07.Report"
+
+# 导出一些常用的变量
+export TRANSCRIPT2GENE_MAP="$WORK_DIR/00.Reference_Genome/ref.transcript2gene_map.txt"
+export REF_GENOME_GTF="$WORK_DIR/00.Reference_Genome/ref.genome.gtf"
+export REF_DIR="$WORK_DIR/00.Reference_Genome"
+export SAMPLE_TABLE_FILE="$WORK_DIR/Master_Sample_Table.${BATCH_ID}.txt"
+
+echo "配置已加载，工作目录: $WORK_DIR"

@@ -1,0 +1,27 @@
+# Data and Results
+data/
+results/
+
+# Tools and Dependencies
+dorado/
+dorado_096/
+guppy/
+nanopolish/
+envs/
+
+# Build Artifacts
+build/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Archives
+*.tar.gz
+*.tar.bz2
+*.zip
