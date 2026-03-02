@@ -159,10 +159,46 @@ if ($debug eq "no") {
 }
 
 print "\n[$local_time] processing all samples from the Batch $batch_id for isoform quantification ..\n";
-system("$flair_dir/flair quantify -t $threads --quality $min_mapping_quality -r $manifest_file -i $batch_id.all_samples_combined.flair_all_collapsed.isoforms.fa -o $batch_id.all_samples_combined"); 
+my $quantify_cmd = "$flair_dir/flair quantify -t $threads --quality $min_mapping_quality -r $manifest_file -i $batch_id.all_samples_combined.flair_all_collapsed.isoforms.fa -o $batch_id.all_samples_combined";
+print "Executing: $quantify_cmd\n";
+my $quantify_exit = system($quantify_cmd);
+
+if ($quantify_exit != 0) {
+    print "Error: flair quantify failed with exit code $quantify_exit\n";
+    # Try running with --help or version to check if flair is runnable from here
+    system("$flair_dir/flair --version");
+} else {
+    print "flair quantify finished successfully.\n";
+}
 
 # fix: output count matrix name change caused by flair2 quantify module
-system("cp $batch_id.all_samples_combined.counts.tsv $batch_id.all_samples_combined.counts_matrix.tsv");
+# 在某些版本的 flair 中，输出文件可能没有扩展名，或者直接是 output_prefix.counts.tsv
+# 我们需要检查所有可能的文件名
+my $count_file = "$batch_id.all_samples_combined.counts.tsv";
+my $quant_file = "$batch_id.all_samples_combined.quantification.tsv";
+# 还有一种情况，flair 可能生成 $batch_id.all_samples_combined/counts.tsv 如果输出被解释为目录，但这里 -o 应该是指前缀
+
+if (-e $count_file) {
+    system("cp $count_file $batch_id.all_samples_combined.counts_matrix.tsv");
+} elsif (-e $quant_file) {
+    system("cp $quant_file $batch_id.all_samples_combined.counts_matrix.tsv");
+} else {
+    # 尝试查找包含 "counts" 或 "quantification" 的文件
+    my @files = glob("$batch_id.all_samples_combined*");
+    my $found = 0;
+    foreach my $file (@files) {
+        if ($file =~ /counts\.tsv$/ || $file =~ /quantification\.tsv$/) {
+             system("cp $file $batch_id.all_samples_combined.counts_matrix.tsv");
+             $found = 1;
+             last;
+        }
+    }
+    if ($found == 0) {
+        print "Error: Cannot find flair quantify output file ($batch_id.all_samples_combined.counts.tsv or $batch_id.all_samples_combined.quantification.tsv)\n";
+        # 尝试列出当前目录文件以便调试
+        system("ls -l $batch_id.all_samples_combined*");
+    }
+}
 
 print "\n[$local_time] processing all samples from the Batch $batch_id for productivity prediction ..\n";
 system("$flair_dir/predictProductivity --append_column --longestORF -i $batch_id.all_samples_combined.flair_all_collapsed.isoforms.bed -g $ref_genome_annotation_file -f $ref_genome_file > $batch_id.all_samples_combined.flair_all_collapsed.isoforms.with_productivity.bed");
@@ -174,7 +210,11 @@ if ($sample_table !~ /^\//) {
 system("$NANOTRANS_HOME/scripts/tidy_count_matrix_output.pl -s $sample_table_path -i $batch_id.all_samples_combined.counts_matrix.tsv -o $batch_id.all_samples_combined.counts_matrix.tidy.txt -x $transcript2gene_map");
 
 system("rm -r tmp");
-system("mkdir intermediate_files");
+if (-d "intermediate_files") {
+    print "Directory intermediate_files already exists, skipping creation.\n";
+} else {
+    system("mkdir intermediate_files");
+}
 system("mv $batch_id.all_samples_combined.flair_all_collapsed.annotated_transcripts.* intermediate_files");
 system("mv $batch_id.all_samples_combined.flair_all_collapsed.combined.isoform.read.map.txt intermediate_files");
 system("mv $batch_id.all_samples_combined.flair_all_collapsed.isoform.read.map.txt intermediate_files");

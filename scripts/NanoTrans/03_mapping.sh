@@ -13,12 +13,12 @@ source "$SCRIPT_DIR/00_config.sh"
 echo ">>> [Step 1] 运行 Module 01: Read Mapping..."
 cd "$WORK_DIR/01.Reference_Genome_based_Read_Mapping"
 
-perl $NANOTRANS_HOME/scripts/batch_long_read_spliced_mapping.pl \
-    -sample_table $SAMPLE_TABLE_FILE \
-    -threads $THREADS \
-    -ref_dir $REF_DIR \
-    -long_reads_dir $WORK_DIR/00.Long_Reads \
-    -batch $BATCH_ID \
+perl "$NANOTRANS_HOME/scripts/batch_long_read_spliced_mapping.pl" \
+    -sample_table "$EXISTING_SAMPLE_TABLE" \
+    -threads "$THREADS" \
+    -ref_dir "$REF_DIR" \
+    -long_reads_dir "$WORK_DIR/00.Long_Reads" \
+    -batch "$BATCH_ID" \
     -debug no
 
 echo "Module 01 完成。"

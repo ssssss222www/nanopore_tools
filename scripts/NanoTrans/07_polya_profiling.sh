@@ -17,7 +17,8 @@ ISOFORM_CQ_DIR="$WORK_DIR/02.Isoform_Clustering_and_Quantification"
 MAPPING_DIR="$WORK_DIR/01.Reference_Genome_based_Read_Mapping"
 
 # 激活环境 (通常使用 nanopolish)
-source $miniconda3_dir/activate $build_dir/nanopolish_conda_env
+# 使用 flair_conda_env 代替 nanopolish_conda_env，因为它包含 nanopolish 以及 R 和 ggplot2 等依赖
+source $miniconda3_dir/activate $build_dir/flair_conda_env
 
 # 注意：Raw fast5 目录需要传递给脚本
 # 这里的 long_reads_dir 在 Module 05 中实际上是指包含 fast5 的目录，或者是 fastq 目录但能找到 fast5

@@ -4,6 +4,7 @@ use strict;
 use Getopt::Long;
 use Env;
 use Cwd;
+use File::Basename;
 
 ##############################################################
 #  script: batch_rna_modification_detection.pl
@@ -49,9 +50,9 @@ my $base_dir = cwd();
 my $output_dir = "$batch_id";
 system("mkdir $output_dir");
 
-my $isoform_clustering_fasta_file = "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.fa";
-my $isoform_clustering_gtf_file = "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.gtf";
-my $isoform_quantification_tsv_file = "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.counts_matrix.tsv";
+my $isoform_clustering_fasta_file = ($isoform_cq_dir =~ /^\//) ? "$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.fa" : "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.fa";
+my $isoform_clustering_gtf_file = ($isoform_cq_dir =~ /^\//) ? "$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.gtf" : "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.flair_all_collapsed.isoforms.gtf";
+my $isoform_quantification_tsv_file = ($isoform_cq_dir =~ /^\//) ? "$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.counts_matrix.tsv" : "$base_dir/$isoform_cq_dir/$batch_id/all_samples_combined/$batch_id.all_samples_combined.counts_matrix.tsv";
 
 if (-e $isoform_clustering_fasta_file) {
     print "Successfully located the isoform clustering fasta file: $isoform_clustering_fasta_file\n";
@@ -90,9 +91,29 @@ foreach my $sample_id (@sample_table) {
     $local_time = localtime();
     print "\n[$local_time] Processing isoform-based mapping for sample $sample_id ..\n";
 
-    my $basecalled_fastq_file = "$base_dir/$long_reads_dir/$sample_table{$sample_id}{'basecalled_fastq_file'}";
-    my $basecalled_fast5_dir = "$base_dir/$long_reads_dir/$sample_table{$sample_id}{'basecalled_fast5_dir'}";
-    my $basecalled_sequencing_summary = "$base_dir/$long_reads_dir/$sample_table{$sample_id}{'basecalled_fast5_dir'}/sequencing_summary.txt";
+    my $raw_fastq_path = $sample_table{$sample_id}{'basecalled_fastq_file'};
+    my $raw_fast5_path = $sample_table{$sample_id}{'basecalled_fast5_dir'};
+    
+    my $basecalled_fastq_file = ($raw_fastq_path =~ /^\//) ? $raw_fastq_path : "$base_dir/$long_reads_dir/$raw_fastq_path";
+    my $basecalled_fast5_dir = ($raw_fast5_path =~ /^\//) ? $raw_fast5_path : "$base_dir/$long_reads_dir/$raw_fast5_path";
+    
+    my $basecalled_sequencing_summary = "$basecalled_fast5_dir/sequencing_summary.txt";
+    
+    if (! -e $basecalled_sequencing_summary) {
+        my $sample_root = dirname($basecalled_fast5_dir);
+        my $alt_summary = "$sample_root/fastq_new/sequencing_summary.txt";
+        if (-e $alt_summary) {
+            $basecalled_sequencing_summary = $alt_summary;
+            print "Found sequencing_summary.txt at alternate location: $basecalled_sequencing_summary\n";
+        } else {
+             $sample_root = dirname(dirname($basecalled_fastq_file));
+             $alt_summary = "$sample_root/fastq_new/sequencing_summary.txt";
+             if (-e $alt_summary) {
+                $basecalled_sequencing_summary = $alt_summary;
+                print "Found sequencing_summary.txt at alternate location: $basecalled_sequencing_summary\n";
+             }
+        }
+    }
     print "Check the specified long read file:\n";
     if (-e $basecalled_fastq_file) {
         print "Successfully located the specified long read file: $basecalled_fastq_file.\n";
@@ -182,8 +203,9 @@ print "\n[$local_time] Perform differential modification profiling ..\n";
 system("$xpore_dir/xpore diffmod --n_processes $threads --config $batch_id.experimental_design.yml");
 system("$xpore_dir/xpore postprocessing --diffmod_dir $combined_output_dir");
 
-system("perl $NANOTRANS_HOME/scripts/tidy_xpore_output.pl -i $combined_output_dir/diffmod.table -o $combined_output_dir/$batch_id.rna_modification.diffmod.table.tidy.txt -x $base_dir/$transcript2gene_map");
-system("perl $NANOTRANS_HOME/scripts/tidy_xpore_output.pl -i $combined_output_dir/majority_direction_kmer_diffmod.table -o $combined_output_dir/$batch_id.rna_modification.majority_direction_kmer_diffmod.table.tidy.txt -x $base_dir/$transcript2gene_map");
+my $transcript2gene_map_path = ($transcript2gene_map =~ /^\//) ? $transcript2gene_map : "$base_dir/$transcript2gene_map";
+system("perl $NANOTRANS_HOME/scripts/tidy_xpore_output.pl -i $combined_output_dir/diffmod.table -o $combined_output_dir/$batch_id.rna_modification.diffmod.table.tidy.txt -x $transcript2gene_map_path");
+system("perl $NANOTRANS_HOME/scripts/tidy_xpore_output.pl -i $combined_output_dir/majority_direction_kmer_diffmod.table -o $combined_output_dir/$batch_id.rna_modification.majority_direction_kmer_diffmod.table.tidy.txt -x $transcript2gene_map_path");
 
 $local_time = localtime();
 print "\n[$local_time] Clean up un-needed files for the batch $batch_id ..\n";

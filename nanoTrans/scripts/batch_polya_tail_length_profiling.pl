@@ -227,7 +227,28 @@ if ($sample_table !~ /^\//) {
     $sample_table_path = "$base_dir/$sample_table";
 }
 system("perl $NANOTRANS_HOME/scripts/pool_polyA_length_distribution_summary.pl -i $sample_table_path -o $batch_id.all_samples_combined.polya_profiling.summary.txt");
-system("Rscript --vanilla --slave $NANOTRANS_HOME/scripts/plot_polyA_length_distribution.R --input $batch_id.all_samples_combined.polya_profiling.summary.txt --prefix $batch_id.all_samples_combined.polya_profiling.comparison");
+
+# Loop through comparison groups
+my %comparison_groups = ();
+foreach my $sample_id (@sample_table) {
+    my $g = $sample_table{$sample_id}{'comparison_group'};
+    if (not exists $comparison_groups{$g}) {
+        @{$comparison_groups{$g}} = ($sample_id);
+    } else {
+        push @{$comparison_groups{$g}}, $sample_id;
+    }
+}
+my @comparison_groups = sort keys %comparison_groups;
+my $comparison_groups_count = scalar @comparison_groups;
+
+if ($comparison_groups_count > 1) {
+    for (my $i = 0; $i < $comparison_groups_count - 1; $i++) {
+        for (my $j = 1; $j < $comparison_groups_count; $j++) {
+            print "\nMaking comparison between groups: $comparison_groups[$i] and $comparison_groups[$j] ..\n";
+            system("Rscript --vanilla --slave $NANOTRANS_HOME/scripts/plot_polya_tail_length_results.R --input $batch_id.all_samples_combined.polya_profiling.summary.txt --group_a $comparison_groups[$i] --group_b $comparison_groups[$j] --prefix $batch_id.all_samples_combined.polya_profiling.comparison");
+        }
+    }
+}
 
 $local_time = localtime();
 print "\n[$local_time] A total of $sample_count samples were processed!\n";

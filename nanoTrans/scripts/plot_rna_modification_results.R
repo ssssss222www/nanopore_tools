@@ -80,11 +80,11 @@ colnames(data) <- colnames.new
 
 data_lower_top  <- data[diff_mod_rate < 0, ][order( diff_mod_rate)] %>% 
   head(n = opt$top_n) %>% 
-  mutate(id = paste0(gene_name, ":", kmer)) %>% 
+  mutate(id = paste0(gene_name, ":", position, ":", kmer)) %>% 
   mutate(id = factor(id, levels = id)) 
 data_higher_top <- data[diff_mod_rate > 0, ][order(-diff_mod_rate)] %>% 
   head(n = opt$top_n) %>% 
-  mutate(id = paste0(gene_name, ":", kmer)) %>% 
+  mutate(id = paste0(gene_name, ":", position, ":", kmer)) %>% 
   mutate(id = factor(id, levels = rev(id))) 
 
 data_top <- rbind(data_lower_top, data_higher_top)

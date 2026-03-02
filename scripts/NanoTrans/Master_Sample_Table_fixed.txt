@@ -1,4 +1,4 @@
-sample_id	comparison_group	replicate_id	basecalled_fastq_file	basecalled_fast5_dir	note
+#sample_id	comparison_group	replicate_id	basecalled_fastq_file	basecalled_fast5_dir	note
 col0-1	control	1	/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_1/merge_fastq/Arabidopsis_col0_1.basecalled_reads.Q5.pass.fastq.gz	/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_1/fast5_multi	Control_Rep1
 col0-4	control	2	/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/merge_fastq/Arabidopsis_col0_4.basecalled_reads.Q5.pass.fastq.gz	/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/fast5_multi	Control_Rep2
 vir1-1	treated	1	/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/merge_fastq/Arabidopsis_vir1_1.basecalled_reads.Q5.pass.fastq.gz	/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/fast5_multi	Treated_Rep1

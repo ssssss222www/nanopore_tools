@@ -26,7 +26,9 @@ export WORK_DIR="/media/user/Elements_YMM/Nanopore/results/nanotrans"
 
 # 2. 数据路径设置
 # 批次ID (用于输出目录命名)
-export BATCH_ID="AT_vir_analysis"
+# 注意：BATCH_ID 中不能包含下划线 "_", 否则会导致 flair quantify 报错
+# 原 ID: AT_vir_analysis
+export BATCH_ID="ATvirAnalysis"
 
 # [单样本模式配置 - 已注释]
 # export BATCH_ID="Arabidopsis_vir1_1"
@@ -47,6 +49,7 @@ export REF_GTF="/mnt/TWET-20250901A/ymm/data/AT_vir/reference/gtf/TAIR10.gtf"
 
 # 4. 样本信息表设置 (Master Sample Table)
 # 如果你已经有了样本表，请设置路径；否则留空，脚本将尝试为你生成一个单样本的示例表
+# 如果 /media/user/Elements_YMM/Nanopore/results/nanotrans/Master_Sample_Table.txt 已经存在
 export EXISTING_SAMPLE_TABLE="$SCRIPT_DIR/Master_Sample_Table.txt"
 
 # 5. 实验设计 (用于差异表达分析)
@@ -86,6 +89,6 @@ mkdir -p "$WORK_DIR/07.Report"
 export TRANSCRIPT2GENE_MAP="$WORK_DIR/00.Reference_Genome/ref.transcript2gene_map.txt"
 export REF_GENOME_GTF="$WORK_DIR/00.Reference_Genome/ref.genome.gtf"
 export REF_DIR="$WORK_DIR/00.Reference_Genome"
-export SAMPLE_TABLE_FILE="$WORK_DIR/Master_Sample_Table.${BATCH_ID}.txt"
+export SAMPLE_TABLE_FILE="$SCRIPT_DIR/Master_Sample_Table_fixed.txt"
 
 echo "配置已加载，工作目录: $WORK_DIR"
