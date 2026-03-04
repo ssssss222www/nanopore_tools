@@ -28,3 +28,4 @@ notebooks/
 *.tar.gz
 *.tar.bz2
 *.zip
+nanoTrans/header.sh
