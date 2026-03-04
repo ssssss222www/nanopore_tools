@@ -6,22 +6,13 @@ set -e -o pipefail
 ################################################################################
 
 # 1. 项目基础设置
-# 你的 NanoTrans 安装目录 (默认上一级目录，假设脚本在 scripts/NanoTrans)
-# 如果脚本位置改变，请修改此处
+# 脚本所在目录
 SCRIPT_DIR="/mnt/TWET-20250901A/ymm/scripts/NanoTrans"
-# 假设 NanoTrans 根目录在 scripts/NanoTrans 的上两级 (scripts/..) ? 
-# 原脚本在 pipelines/NanoTrans/custom_analysis_pipeline.sh, 所以 NANOTRANS_HOME 是 pipelines/NanoTrans/../.. = project_root
-# 现脚本在 scripts/NanoTrans/, 所以 NANOTRANS_HOME 应该是 scripts/NanoTrans/../.. = project_root
-# 为了保险，这里建议硬编码或者根据实际情况调整。
-# 既然用户给的路径是 /mnt/TWET-20250901A/ymm/scripts/NanoTrans
-# 而 NanoTrans 安装在 /mnt/TWET-20250901A/ymm/nanoTrans (根据之前的 ls 和 env 信息)
-# 让我们看看之前的 terminal cwd: /mnt/TWET-20250901A/ymm/nanoTrans
-# 之前的 install_dependencies.sh 也是在 /mnt/TWET-20250901A/ymm/nanoTrans 下
-# 所以 NANOTRANS_HOME 应该是 /mnt/TWET-20250901A/ymm/nanoTrans
 
+# NanoTrans 根目录
 export NANOTRANS_HOME="/mnt/TWET-20250901A/ymm/nanoTrans"
 
-# 你的工作/输出目录 (所有结果将生成在这里)
+# 工作/输出目录 (所有结果将生成在这里)
 export WORK_DIR="/media/user/Elements_YMM/Nanopore/results/nanotrans"
 
 # 2. 数据路径设置

@@ -23,6 +23,3 @@ bash /mnt/TWET-20250901A/ymm/scripts/NanoTrans/06_rna_modification.sh
 
 ## polya_profiling
 bash /mnt/TWET-20250901A/ymm/scripts/NanoTrans/07_polya_profiling.sh
-
-## report
-bash /mnt/TWET-20250901A/ymm/scripts/NanoTrans/09_report.sh
