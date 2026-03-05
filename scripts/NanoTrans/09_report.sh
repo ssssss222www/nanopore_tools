@@ -26,6 +26,21 @@ mkdir -p "$TMP_REPORT_DIR"
 cd "$TMP_REPORT_DIR"
 cp "$NANOTRANS_HOME/Project_Template/07.Report/NanoTrans_Report.qmd" .
 
+# Copy necessary files
+cp "$NANOTRANS_HOME/NanoTrans.logo.png" .
+# Update logo path in qmd
+sed -i 's|../../NanoTrans.logo.png|NanoTrans.logo.png|' NanoTrans_Report.qmd
+
+# Copy sample table
+# Determine which sample table to use
+if [ -f "$SCRIPT_DIR/Master_Sample_Table_fixed.txt" ]; then
+    cp "$SCRIPT_DIR/Master_Sample_Table_fixed.txt" "Master_Sample_Table.${BATCH_ID}.txt"
+elif [ -f "$SCRIPT_DIR/Master_Sample_Table.txt" ]; then
+    cp "$SCRIPT_DIR/Master_Sample_Table.txt" "Master_Sample_Table.${BATCH_ID}.txt"
+else
+    echo "Warning: No Master_Sample_Table found in $SCRIPT_DIR"
+fi
+
 # 激活 Quarto 环境
 # 使用 flair_conda_env，因为它包含 R 和必要的依赖
 source $miniconda3_dir/activate $build_dir/flair_conda_env

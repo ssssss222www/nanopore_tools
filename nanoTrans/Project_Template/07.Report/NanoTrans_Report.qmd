@@ -58,7 +58,37 @@ test_read_file <- function(filepath) {
 # test print file
 test_print_plots <- function(filepath) {
   if(length(filepath) > 0) {
-    knitr::include_graphics(filepath)
+    # Check if file is PDF, if so convert to PNG or check if PNG exists
+    valid_paths <- c()
+    for (f in filepath) {
+        if (grepl("\\.pdf$", f, ignore.case = TRUE)) {
+            # Copy to temp dir to avoid permission issues and clutter
+            local_pdf <- basename(f)
+            file.copy(f, local_pdf, overwrite = TRUE)
+            
+            # Use local png name (remove .pdf extension properly)
+            local_png_prefix <- sub("\\.pdf$", "", local_pdf, ignore.case = TRUE)
+            local_png <- paste0(local_png_prefix, ".png")
+            
+            # Convert using pdftoppm
+            # pdftoppm -png -singlefile -r 150 input.pdf output_prefix
+            cmd <- paste("pdftoppm -png -singlefile -r 150", shQuote(local_pdf), shQuote(local_png_prefix))
+            system(cmd)
+            
+            if (file.exists(local_png)) {
+                valid_paths <- c(valid_paths, local_png)
+            } else {
+                # Fallback to original if conversion fails
+                valid_paths <- c(valid_paths, f)
+            }
+        } else {
+            valid_paths <- c(valid_paths, f)
+        }
+    }
+    
+    if (length(valid_paths) > 0) {
+        knitr::include_graphics(valid_paths)
+    }
   } else {
     print("The file does not exist.")
   }
@@ -78,13 +108,13 @@ dt_outputs <- data.table(
   Module_03_dei_table     = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "table",  ".*.differential_isoform_expression.tidy.txt$"),
   Module_03_diu_table     = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "table",  ".*.differential_isoform_usage.tidy.txt$"),
   Module_03_dsi_table     = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "table",  ".*.differential_isoform_splicing.all.events.quant.tidy.txt$"),
-  Module_03_deg_volcano   = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "figure", ".*.differential_gene_expression.tidy.for_plot.volcanoplot.pdf$"),
-  Module_03_dei_volcano   = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "figure", ".*.differential_isoform_expression.tidy.for_plot.volcanoplot.pdf$"),
+  Module_03_deg_volcano   = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "figure", ".*.differential_gene_volcanoplot.pdf$"),
+  Module_03_dei_volcano   = c("03.Isoform_Expression_and_Splicing_Comparison", batch_id, "figure", ".*.differential_isoform_volcanoplot.pdf$"),
   Module_04_mod_table     = c("04.Isoform_RNA_Modification_Identification",    batch_id, "figure", ".*.rna_modification.majority_direction_kmer_diffmod.table.tidy.filtered.txt$"),
   Module_04_mod_top_figs  = c("04.Isoform_RNA_Modification_Identification",    batch_id, "figure", ".*.rna_modification.majority_direction_kmer_diffmoddiff_RNA_mod.*.top20.pdf$"),
-  Module_04_mod_char_figs = c("04.Isoform_RNA_Modification_Identification",    batch_id, "figure", "plot.*.pdf$"),
+  Module_04_mod_char_figs = c("04.Isoform_RNA_Modification_Identification",    batch_id, "figure", ".*.rna_modification.diffmoddiff_RNA_mod.*.top20.pdf$"),
   Module_05_polya_table   = c("05.Isoform_PolyA_Tail_Length_Profiling",        batch_id, "figure", ".*.all_samples_combined.polya_profiling.summary.txt$"),
-  Module_05_polya_figs    = c("05.Isoform_PolyA_Tail_Length_Profiling",        batch_id, "figure", "*.polya_tail_length.*_length.*_plot.pdf$"),
+  Module_05_polya_figs    = c("05.Isoform_PolyA_Tail_Length_Profiling",        batch_id, "figure", ".*.polya_profiling.*.density_plot.pdf$|.*.polya_profiling.*.violin_plot.pdf$"),
   Module_06_genefus_figs  = c("06.Gene_Fusion_Detection",                      batch_id, "figure", ".*.gene_fusion_plot.pdf$")
 )
 
