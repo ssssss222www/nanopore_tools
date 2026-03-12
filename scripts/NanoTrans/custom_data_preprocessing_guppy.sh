@@ -78,7 +78,7 @@ mkdir -p "$basecalled_fast5_dir"
 mkdir -p "$basecalled_fastq_dir"
 
 # GPU 环境配置
-# 想要 fast5_out 就设为 "--fast5_out"，不想要就留空 ""
+# 想要 fast5_out 就设为 "--fast5_out"，不想要就留空 ""；这个参数关乎tailfindr的输入是否包含Move_table
 fast5_out_flag="--fast5_out"
 
 if [[ $guppy_run_mode == "gpu" ]]; then
