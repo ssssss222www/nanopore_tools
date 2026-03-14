@@ -1,0 +1,113 @@
+rule chrom_sizes:
+    input:
+        fasta = (lambda wildcards:
+                 config['genome']['fasta'][wildcards['genome']])
+    threads: 1
+    resources:
+        mem_gb = 4
+    output:
+        chrom_sizes = config['common']['chrom_sizes']
+    shell:
+        "faidx {input.fasta} -i chromsizes > {output.chrom_sizes}"
+
+
+rule utr_fix:
+    input:
+        gtf = 'data/resources/common/{gtf}.gtf'
+    threads: 1
+    resources:
+        mem_gb = 16
+    output:
+        gtf = 'data/resources/common/{gtf}.utr_fix.gtf'
+    shell:
+        "gencode_utr_fix --input_gtf {input.gtf} --output_gtf {output.gtf}"
+
+
+rule site_motif:
+    threads: 1
+    resources:
+        mem_gb = 1
+    output:
+        motif_logo = "reports/figures/polyA_motif.pdf"
+    script:
+        "polyA_motif.py"
+
+
+rule gtf_tes:
+    input:
+        gtf = (lambda wildcards:
+               config['genome']['gtf'][wildcards['genome']])
+    threads: 1
+    resources:
+        mem_gb = 8
+    output:
+        tes = config['common']['tes']
+    script:
+        "gtf_tes.py"
+
+
+rule fasta_read_count:
+    input:
+        fasta = config['encode']['fasta']
+    output:
+        txt = config['encode']['fasta_read_count']
+    threads: 1
+    resources:
+        mem_gb = 4
+    shell:
+        "expr $(zcat {input.fasta} | grep '>' | wc -l) > {output.txt}"
+
+
+rule fastq_read_count:
+    input:
+        fastq = config['encode']['fastq']
+    output:
+        txt = config['encode']['fastq_read_count']
+    threads: 1
+    resources:
+        mem_gb = 4
+    shell:
+        "expr $(zcat {input.fastq} | wc -l) / 4 > {output.txt}"
+
+
+rule bam_read_count:
+    input:
+        bam = bam
+    output:
+        txt = config['encode']['bam_read_count']
+    threads: 1
+    resources:
+        mem_gb = 4
+    shell:
+        "samtools view -F 4 -F 256 -F 2048 -q 10 -c {input.bam} > {output.txt}"
+
+
+rule bam_aligned_len:
+    input:
+        bam = bam
+    output:
+        txt = config['encode']['bam_aligned_len']
+    threads: 1
+    resources:
+        mem_gb = 4
+    script:
+        "bam_aligned_len.py"
+
+
+rule gene_name_id_mapping:
+    input:
+        gtf = (lambda wildcards:
+               config['genome']['gtf'][wildcards['genome']])
+    threads: 1
+    resources:
+        mem_gb = 8
+    output:
+        mapping = config['common']['gene_id_name_mapping']
+    script:
+        "gene_id_name_mapping.py"
+
+
+rule all_common:
+    input:
+        expand(rules.chrom_sizes.output, genome=['mm10', 'hg38']),
+        rules.site_motif.output

@@ -1,0 +1,5 @@
+sample,dataset,path
+col0_1,control,/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_1/bam/col0-1.sort.bam
+col0_4,control,/media/user/Elements_YMM/Nanopore/data/AT_vir/control/col0_4/bam/col0-4.sort.bam
+vir1_1,treatment,/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_1/bam/vir1-1.sort.bam
+vir1_4,treatment,/media/user/Elements_YMM/Nanopore/data/AT_vir/treatment/vir1_4/bam/vir1-4.sort.bam

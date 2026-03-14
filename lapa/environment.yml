@@ -1,0 +1,32 @@
+name: lapa
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - python
+  - pip
+  - samtools
+  - ucsc-bedtobigbed
+  - seqkit
+  - star
+  - minimap2
+  - snakemake
+  - pip:
+    - pdf2image
+    - openpyxl
+    - biopython
+    - jupyter
+    - notebook
+    - pytest
+    - pytest-xdist
+    - cython
+    - pyfaidx
+    - seaborn
+    - snakemk_util
+    - adjustText
+    - patchworklib
+    - sklearn
+    - more_itertools
+    - git+https://github.com/nboley/idr.git
+    - -e .

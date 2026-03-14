@@ -1,0 +1,77 @@
+rule c2c12_lapa_config:
+    threads: 1
+    resources:
+        mem_gb = 1
+    output:
+        sample_config = config['c2c12']['config']
+    script:
+        "./c2c12_config.py"
+
+
+rule lapa_c2c12:
+    input:
+        aligment = config['c2c12']['config'],
+        fasta = config['genome']['fasta']['mm10'],
+        gtf = config['genome']['gtf']['mm10'],
+        chrom_sizes = config['common']['chrom_sizes'].format(genome='mm10')
+    threads: 1
+    resources:
+        mem_gb = 16
+    output:
+        directory(config['c2c12']['lapa_dir'])
+    shell:
+        "lapa \
+        --alignment {input.aligment} \
+        --fasta {input.fasta} \
+        --annotation {input.gtf} \
+        --chrom_sizes {input.chrom_sizes} \
+        --counting_method end \
+        --output_dir {output}"
+
+
+rule lapa_c2c12_test:
+    input:
+        long_read = config['c2c12']['lapa_dir'],
+        mapping = config['common']['gene_id_name_mapping'].format(
+            genome='mm10')
+    threads: 1
+    resources:
+        mem_gb = 16
+    output:
+        stats = config['c2c12']['stats']
+    script:
+        "./c2c12_stats.py"
+
+
+rule differential_apa_c2c12:
+    input:
+        stats = config['c2c12']['stats'],
+        long_read = config['c2c12']['lapa_dir']
+    threads: 1
+    resources:
+        mem_gb = 16
+    output:
+        volcona_plot = 'reports/figures/c2c12_volcona.png',
+        heatmap_plot = 'reports/figures/c2c12_heatmap.png'
+    notebook:
+        "./differential_apa.ipynb"
+
+
+rule differential_apa_abundance_c2c12:
+    input:
+        stats = config['c2c12']['stats'],
+        long_read = config['c2c12']['lapa_dir']
+    threads: 1
+    resources:
+        mem_gb = 16
+    output:
+        boxplot = 'reports/figures/c2c12_boxplot_gene.png',
+        scatterplot = 'reports/figures/c2c12_scatterplot_gene.png'
+    notebook:
+        "./apa_differetial_gene_exp.ipynb"
+
+
+rule all_c2c12:
+    input:
+        rules.differential_apa_c2c12.output,
+        rules.differential_apa_abundance_c2c12.output
