@@ -8,19 +8,19 @@
 
 ## APALORD
 这个项目包含了APALORD的安装和运行脚本。该工具用于比较两组样本（如 D0 和 D7）之间 APA 差异：
-Step 0: 初始化环境
+### Step 0: 初始化环境
 加载必要的 R 包（APALORD 和 ggplot2），并创建用于存放分析结果的输出目录
 
-Step 1: 加载基因组注释 (GTF)
+### Step 1: 加载基因组注释 (GTF)
 使用 load_gtf() 函数读取基因组的注释文件（示例中使用的是人类 hg38 的 21 号染色体子集）。这一步的作用是提取基因、转录本以及外显子的坐标信息，为后续多聚腺苷酸化位点（PAS）的定位提供基因组坐标参考。
 
-Step 2: 加载样本数据
+### Step 2: 加载样本数据
 通过 load_samples() 函数导入两组样本路径。示例中包含对照组 D0 和实验组 D7，每组各 3 个生物学重复。这定义了后续差异分析的对比矩阵。
 
-Step 3: 识别 PolyA 位点 (PAS Calling)
+### Step 3: 识别 PolyA 位点 (PAS Calling)
 调用 PAS_calling() 函数在全转录组范围内从测序序列中识别 PolyA 位点。结果被保存为标准的 BED 格式文件，记录了所有被识别出的 PAS 的基因组坐标。
 
-Step 4: PAU 定量与差异分析
+### Step 4: PAU 定量与差异分析
 
  4.1 PAU 定量：PAU_by_sample() 计算每个样本中各个 PAS 的使用比例（PolyA Usage, PAU）。
 
@@ -28,10 +28,10 @@ Step 4: PAU 定量与差异分析
 
  4.3 偏好性偏移分析：end_PAS_examine() 进一步细化分析，评估多聚腺苷酸化位点在两组间是倾向于向远端（distal）延伸还是向近端（proximal）截断。
 
-Step 5: 全局 APA 谱分析 (APA Profiling)
+### Step 5: 全局 APA 谱分析 (APA Profiling)
 使用 APA_profile() 和 APA_plot() 整合所有基因的 APA 变化趋势，评估转录组水平的整体 APA 谱改变，并输出包含显著变化基因列表的数据表以及用于宏观展示的火山图（Volcano plot）。
 
-Step 6: 单基因水平探索
+### Step 6: 单基因水平探索
 利用 gene_explore() 函数，针对特定的候选基因（如 "GART", "ZBTB21"），提取对应的读取覆盖度与 PAS 使用情况，并绘制可视化的 PDF 图像，方便进行个案级别的验证和展示。
 
 ## NanoTrans
